@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,10 +6,9 @@ import '../models/item.dart';
 import '../models/transaction.dart';
 
 class ApiService {
-  // Use localhost for Web, and local IP for physical Android devices
+  // Cloud deployment URL
   static String get baseUrl {
-    if (kIsWeb) return 'http://localhost:5000';
-    return 'http://10.65.168.111:5000';
+    return 'https://school-backend-oiun.onrender.com';
   }
 
   String? _token;
