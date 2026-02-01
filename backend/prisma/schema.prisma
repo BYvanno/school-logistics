@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   // ADMIN, STOREKEEPER, TEACHER
+  createdAt DateTime @default(now())
+  
+  requests  Request[]
+  transactions Transaction[]
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  items Item[]
+}
+
+model Supplier {
+  id      Int    @id @default(autoincrement())
+  name    String
+  contact String?
+  address String?
+  items   Item[]
+}
+
+model Item {
+  id            Int      @id @default(autoincrement())
+  name          String
+  description   String?
+  quantity      Int      @default(0)
+  unit          String   // e.g., "pcs", "kg"
+  minStockLevel Int      @default(5)
+  
+  categoryId    Int
+  category      Category @relation(fields: [categoryId], references: [id])
+  
+  supplierId    Int?
+  supplier      Supplier? @relation(fields: [supplierId], references: [id])
+
+  requests      Request[]
+  transactions  Transaction[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Request {
+  id          Int      @id @default(autoincrement())
+  requesterId Int
+  requester   User     @relation(fields: [requesterId], references: [id])
+  
+  itemId      Int
+  item        Item     @relation(fields: [itemId], references: [id])
+  
+  quantity    Int
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  reason      String?  // Why the teacher needs it
+  adminNote   String?  // Reason for rejection/approval
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Transaction {
+  id        Int      @id @default(autoincrement())
+  type      String   // IN, OUT, ADJUSTMENT
+  quantity  Int
+  
+  itemId    Int
+  item      Item     @relation(fields: [itemId], references: [id])
+  
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  
+  reason    String?
+  createdAt DateTime @default(now())
+}
