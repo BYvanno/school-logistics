@@ -21,6 +21,16 @@ async function main() {
     } else {
         console.log('Admin user already exists');
     }
+
+    // Create default categories
+    const categories = ['Stationery', 'Electronics', 'Furniture', 'Sports', 'Cleaning'];
+    for (const name of categories) {
+        const existingCategory = await prisma.category.findUnique({ where: { name } });
+        if (!existingCategory) {
+            await prisma.category.create({ data: { name } });
+            console.log(`Category '${name}' created`);
+        }
+    }
 }
 
 main()
